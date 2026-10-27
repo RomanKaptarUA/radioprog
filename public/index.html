@@ -1,0 +1,1416 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Слухайте наживо радіостанції Європи та України."
+    />
+    <meta name="theme-color" content="#10110f" />
+    <title>Radio Kevin — радіо Європи та України наживо</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: #10110f;
+        color: #f3f1e9;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        --muted: #8e9088;
+        --line: #2a2b27;
+        --lime: #d3f36b;
+        --panel: #181916;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        position: relative;
+        isolation: isolate;
+        min-width: 320px;
+        min-height: 100vh;
+        margin: 0;
+        padding-bottom: 112px;
+        background: transparent;
+      }
+
+      body::before {
+        position: fixed;
+        z-index: -1;
+        inset: 0;
+        background:
+          linear-gradient(180deg, #10110f9c 0%, #10110f80 42%, #10110fc9 100%),
+          url("/radio-kevin-background.jpg") center 35% / cover no-repeat;
+        filter: brightness(0.68);
+        opacity: 0.72;
+        pointer-events: none;
+        content: "";
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+
+      button {
+        color: inherit;
+      }
+
+      .shell {
+        width: min(1120px, calc(100% - 48px));
+        margin: 0 auto;
+      }
+
+      .topbar {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: #f3f1e9;
+        font-family: "Segoe UI", Arial, sans-serif;
+        font-size: 19px;
+        font-weight: 700;
+        letter-spacing: -0.8px;
+        text-decoration: none;
+      }
+
+      .brand-mark {
+        width: 29px;
+        height: 29px;
+        display: grid;
+        place-items: center;
+        border-radius: 9px;
+        background: var(--lime);
+        color: #15170e;
+      }
+
+      .brand-mark svg {
+        width: 17px;
+      }
+
+      h2,
+      p {
+        margin-top: 0;
+      }
+
+      .country-picker {
+        width: min(100%, 300px);
+        height: 46px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 15px;
+        border: 1px solid #42443c;
+        border-radius: 9px;
+        background: #191a16;
+      }
+
+      .country-picker svg {
+        width: 18px;
+        flex: 0 0 auto;
+        color: var(--lime);
+      }
+
+      select {
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #f3f1e9;
+        cursor: pointer;
+      }
+
+      select option {
+        background: #191a16;
+      }
+
+      .directory {
+        padding-top: 20px;
+      }
+
+      .directory-head {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+
+      h2 {
+        margin-bottom: 0;
+        font-family: "Segoe UI", Arial, sans-serif;
+        font-size: 24px;
+        font-weight: 500;
+        letter-spacing: -0.7px;
+      }
+
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+
+      .filter-tabs {
+        display: flex;
+        gap: 5px;
+        padding: 4px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        background: #151613;
+      }
+
+      .filter-button {
+        min-height: 32px;
+        padding: 0 12px;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      .filter-button[aria-pressed="true"] {
+        background: #303128;
+        color: var(--lime);
+      }
+
+      .search {
+        width: min(260px, 50%);
+        height: 40px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 0 11px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #151613;
+      }
+
+      .search svg {
+        width: 16px;
+        flex: 0 0 auto;
+        color: var(--muted);
+      }
+
+      .search input {
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #f3f1e9;
+        font-size: 12px;
+      }
+
+      .search input::placeholder {
+        color: #777970;
+      }
+
+      .station-list {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .station-card {
+        position: relative;
+        min-width: 0;
+        min-height: 76px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 9px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--panel);
+        animation: card-arrive 420ms both;
+        transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
+      }
+
+      .station-card:nth-child(4n + 2) {
+        animation-delay: 35ms;
+      }
+
+      .station-card:nth-child(4n + 3) {
+        animation-delay: 70ms;
+      }
+
+      .station-card:nth-child(4n + 4) {
+        animation-delay: 105ms;
+      }
+
+      .station-card:hover,
+      .station-card.is-playing {
+        border-color: #5a6140;
+        background: #1d1f18;
+      }
+
+      .station-card:hover {
+        transform: translateY(-2px);
+      }
+
+      .station-logo {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        border: 1px solid #34362e;
+        border-radius: 8px;
+        background: #22241d;
+        color: var(--lime);
+        font-family: "Segoe UI", Arial, sans-serif;
+        font-size: 17px;
+        font-weight: 600;
+      }
+
+      .station-logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .station-card.is-playing .station-logo {
+        animation: signal-glow 2.2s ease-in-out infinite;
+      }
+
+      .station-details {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .station-name {
+        overflow: hidden;
+        margin: 0 0 5px;
+        font-size: 13px;
+        font-weight: 600;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .station-meta {
+        overflow: hidden;
+        margin: 0;
+        color: var(--muted);
+        font-size: 11px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .station-actions {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+      }
+
+      .icon-button,
+      .play-button {
+        width: 36px;
+        height: 36px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        border: 1px solid #383a32;
+        border-radius: 50%;
+        background: transparent;
+        cursor: pointer;
+        transition: 150ms ease;
+      }
+
+      .icon-button {
+        width: 32px;
+        height: 32px;
+        border-color: transparent;
+        color: #898b82;
+      }
+
+      .icon-button:hover,
+      .icon-button.is-favorite {
+        color: var(--lime);
+      }
+
+      .icon-button.is-favorite svg {
+        fill: currentColor;
+        animation: heart-pop 260ms ease-out;
+      }
+
+      .play-button {
+        color: var(--lime);
+      }
+
+      .play-button:hover {
+        border-color: var(--lime);
+        background: #d3f36b12;
+      }
+
+      .play-button.is-playing {
+        position: relative;
+        border-color: var(--lime);
+        background: var(--lime);
+        color: #14160d;
+      }
+
+      .play-button.is-playing::after {
+        position: absolute;
+        inset: -4px;
+        border: 1px solid #d3f36b99;
+        border-radius: inherit;
+        animation: button-ripple 1.8s ease-out infinite;
+        content: "";
+        pointer-events: none;
+      }
+
+      .play-button svg,
+      .player-main-button svg {
+        transition: transform 180ms ease;
+      }
+
+      .play-button:active svg,
+      .player-main-button:active svg {
+        transform: scale(0.78);
+      }
+
+      .icon-button svg,
+      .play-button svg {
+        width: 15px;
+        height: 15px;
+      }
+
+      .play-button svg {
+        width: 14px;
+      }
+
+      .message {
+        min-height: 150px;
+        display: grid;
+        place-content: center;
+        justify-items: center;
+        gap: 10px;
+        padding: 24px;
+        border: 1px dashed #383a32;
+        border-radius: 10px;
+        color: var(--muted);
+        font-size: 13px;
+        text-align: center;
+      }
+
+      .message[hidden] {
+        display: none;
+      }
+
+      .retry-button {
+        padding: 8px 13px;
+        border: 1px solid #525643;
+        border-radius: 7px;
+        background: #22241d;
+        color: var(--lime);
+        cursor: pointer;
+      }
+
+      .player {
+        position: fixed;
+        z-index: 2;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        border-top: 1px solid #34362e;
+        background: #171814f2;
+        backdrop-filter: blur(14px);
+      }
+
+      .player-inner {
+        min-height: 82px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .player-art {
+        width: 44px;
+        height: 44px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        border-radius: 7px;
+        background: #26281f;
+        color: var(--lime);
+        font-family: "Segoe UI", Arial, sans-serif;
+        font-weight: 600;
+      }
+
+      .player-art img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .player-info {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .player-name {
+        overflow: hidden;
+        margin: 0 0 4px;
+        font-size: 12px;
+        font-weight: 600;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .player-status {
+        margin: 0;
+        color: var(--muted);
+        font-size: 10px;
+      }
+
+      .player-status.is-live {
+        color: var(--lime);
+      }
+
+      .signal-meter {
+        height: 24px;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        padding: 0 10px;
+        color: var(--lime);
+        opacity: 0.35;
+        transition: opacity 180ms ease;
+      }
+
+      .signal-meter span {
+        width: 3px;
+        height: 5px;
+        border-radius: 3px;
+        background: currentColor;
+        transform: scaleY(0.5);
+        transform-origin: center;
+      }
+
+      .signal-meter.is-playing {
+        opacity: 1;
+      }
+
+      .signal-meter.is-playing span {
+        animation: meter-dance 720ms ease-in-out infinite alternate;
+      }
+
+      .signal-meter.is-playing span:nth-child(2) {
+        animation-delay: -520ms;
+      }
+
+      .signal-meter.is-playing span:nth-child(3) {
+        animation-delay: -180ms;
+      }
+
+      .signal-meter.is-playing span:nth-child(4) {
+        animation-delay: -630ms;
+      }
+
+      .signal-meter.is-playing span:nth-child(5) {
+        animation-delay: -350ms;
+      }
+
+      .player-main-button {
+        width: 42px;
+        height: 42px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: 50%;
+        background: var(--lime);
+        color: #14160d;
+        cursor: pointer;
+        transition: transform 180ms ease, box-shadow 180ms ease;
+      }
+
+      .player-main-button.is-playing {
+        box-shadow: 0 0 0 5px #d3f36b1c, 0 0 24px #d3f36b4d;
+        animation: player-breathe 1.6s ease-in-out infinite;
+      }
+
+      .player-main-button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+
+      .player-main-button svg {
+        width: 17px;
+      }
+
+      .volume {
+        width: 100px;
+        accent-color: var(--lime);
+      }
+
+      .volume-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+      }
+
+      .volume-label svg {
+        width: 16px;
+      }
+
+      audio {
+        display: none;
+      }
+
+      @keyframes card-arrive {
+        from {
+          opacity: 0;
+          filter: blur(4px);
+        }
+
+        to {
+          opacity: 1;
+          filter: blur(0);
+        }
+      }
+
+      @keyframes signal-glow {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 #d3f36b00;
+        }
+
+        50% {
+          box-shadow: 0 0 0 4px #d3f36b24, 0 0 18px #d3f36b38;
+        }
+      }
+
+      @keyframes button-ripple {
+        from {
+          opacity: 0.9;
+          transform: scale(0.92);
+        }
+
+        to {
+          opacity: 0;
+          transform: scale(1.45);
+        }
+      }
+
+      @keyframes meter-dance {
+        from {
+          transform: scaleY(0.45);
+        }
+
+        to {
+          transform: scaleY(2.6);
+        }
+      }
+
+      @keyframes player-breathe {
+        0%,
+        100% {
+          box-shadow: 0 0 0 3px #d3f36b17, 0 0 14px #d3f36b30;
+        }
+
+        @keyframes heart-pop {
+          0% {
+            transform: scale(0.65);
+          }
+
+          70% {
+            transform: scale(1.2);
+          }
+
+          100% {
+            transform: scale(1);
+          }
+        }
+
+        50% {
+          box-shadow: 0 0 0 7px #d3f36b0d, 0 0 25px #d3f36b66;
+        }
+      }
+
+      @media (min-width: 681px) and (max-width: 980px) {
+        .station-list {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (max-width: 680px) {
+        .shell {
+          width: min(100% - 32px, 540px);
+        }
+
+        .topbar {
+          height: 65px;
+        }
+
+        .directory {
+          padding-top: 12px;
+        }
+
+        .directory-head {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .toolbar {
+          align-items: stretch;
+          flex-direction: column-reverse;
+        }
+
+        .search {
+          width: 100%;
+        }
+
+        .filter-tabs {
+          align-self: flex-start;
+        }
+
+        .station-list {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .station-card {
+          flex-wrap: wrap;
+          gap: 7px;
+          padding: 8px;
+        }
+
+        .station-actions {
+          margin-left: auto;
+        }
+
+        .player-inner {
+          min-height: 74px;
+        }
+
+        .volume-label {
+          display: none;
+        }
+
+        .player-art {
+          width: 39px;
+          height: 39px;
+        }
+
+        .signal-meter {
+          gap: 2px;
+          padding: 0 4px;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .station-list {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          transition-duration: 0.01ms !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="shell topbar">
+      <a class="brand" href="#" aria-label="Radio Kevin — на головну" data-i18n-aria="brandHome">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 10a10 10 0 0 1 14 0M8 13a6 6 0 0 1 8 0m-5 4a2 2 0 0 1 2 0" />
+            <circle cx="12" cy="20" r="1" fill="currentColor" stroke="none" />
+          </svg>
+        </span>
+        radio Kevin
+      </a>
+    </header>
+
+    <main>
+      <section class="shell directory" aria-labelledby="directory-title">
+        <div class="directory-head">
+          <h2 id="directory-title"><span data-i18n="stations">Радіостанції</span> · <span id="selected-country">Європа та Азія</span></h2>
+          <label class="country-picker">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M3 12h18M12 3a15 15 0 0 1 0 18m0-18a15 15 0 0 0 0 18" />
+            </svg>
+            <select id="country-select" aria-label="Оберіть країну" data-i18n-aria="chooseCountry">
+              <option value="" data-i18n="loadingCountries">Завантажую країни…</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="toolbar">
+          <div class="filter-tabs" role="group" aria-label="Фільтр радіостанцій" data-i18n-aria="stationFilters">
+            <button class="filter-button" type="button" data-filter="all" aria-pressed="true" data-i18n="allStations">Усі станції</button>
+            <button class="filter-button" type="button" data-filter="favorites" aria-pressed="false" data-i18n="favorites">Обрані</button>
+          </div>
+          <label class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <circle cx="10.8" cy="10.8" r="6.8" />
+              <path d="m16 16 4.5 4.5" />
+            </svg>
+            <input id="station-search" type="search" placeholder="Знайти станцію…" data-i18n-placeholder="searchStation" autocomplete="off" />
+          </label>
+        </div>
+
+        <div class="station-list" id="station-list" aria-live="polite"></div>
+        <div class="message" id="message" role="status">
+          <span id="message-text" data-i18n="loadingStations">Завантажуємо станції…</span>
+          <button class="retry-button" id="retry-button" type="button" hidden data-i18n="tryAgain">Спробувати ще раз</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="player" aria-label="Аудіоплеєр" data-i18n-aria="audioPlayer">
+      <div class="shell player-inner">
+        <div class="player-art" id="player-art" aria-hidden="true">RA</div>
+        <div class="player-info">
+          <p class="player-name" id="player-name" data-i18n="pickStation">Обери станцію, щоб почати слухати</p>
+          <p class="player-status" id="player-status" data-i18n="liveEuropeAsia">Прямий ефір · Європа та Азія</p>
+        </div>
+        <div class="signal-meter" id="signal-meter" role="img" aria-label="Стан ефіру" data-i18n-aria="broadcastStatus" aria-live="polite">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <label class="volume-label" aria-label="Гучність" data-i18n-aria="volume">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+            <path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12" />
+          </svg>
+          <input class="volume" id="volume" type="range" min="0" max="1" step="0.01" value="0.8" />
+        </label>
+        <button class="player-main-button" id="player-toggle" type="button" aria-label="Відтворити" data-i18n-aria="play" disabled>
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+        </button>
+      </div>
+      <audio id="audio-player" preload="none"></audio>
+    </footer>
+
+    <script>
+      const countrySelect = document.querySelector("#country-select");
+      const selectedCountry = document.querySelector("#selected-country");
+      const stationList = document.querySelector("#station-list");
+      const message = document.querySelector("#message");
+      const messageText = document.querySelector("#message-text");
+      const retryButton = document.querySelector("#retry-button");
+      const searchInput = document.querySelector("#station-search");
+      const audio = document.querySelector("#audio-player");
+      const playerName = document.querySelector("#player-name");
+      const playerStatus = document.querySelector("#player-status");
+      const playerArt = document.querySelector("#player-art");
+      const playerToggle = document.querySelector("#player-toggle");
+      const signalMeter = document.querySelector("#signal-meter");
+      const volume = document.querySelector("#volume");
+      const favoriteKey = "radio-kevin-favorites";
+      const translations = {
+        uk: {
+          brandHome: "Radio Kevin — на головну",
+          chooseCountry: "Вибери країну",
+          loadingCountries: "Завантажую країни…",
+          loadingStations: "Завантажуємо станції…",
+          stations: "Радіостанції",
+          stationFilters: "Фільтр радіостанцій",
+          allStations: "Усі станції",
+          favorites: "Обрані",
+          searchStation: "Знайти станцію…",
+          tryAgain: "Спробувати ще раз",
+          audioPlayer: "Аудіоплеєр",
+          pickStation: "Обери станцію, щоб почати слухати",
+          liveEuropeAsia: "Прямий ефір",
+          broadcastStatus: "Стан ефіру",
+          volume: "Гучність",
+          play: "Відтворити",
+          pause: "Пауза",
+          live: "НАЖИВО",
+          loading: "Завантаження…",
+          noCountries: "Поки немає доступних країн. Спробуй оновити список.",
+          countriesError: "Не вдалося завантажити країни. Перевір з’єднання та спробуй ще раз.",
+          stationsError: "Не вдалося завантажити станції. Перевір з’єднання та спробуй ще раз.",
+          searching: (country) => `Шукаємо радіостанції у країні ${getCountryName(country)}…`,
+          noFavorites: "У цій країні ще немає збережених станцій.",
+          noResults: "Нічого не знайдено. Спробуй інший пошуковий запит.",
+          listen: (name) => `Слухати ${name}`,
+          pauseStation: (name) => `Пауза: ${name}`,
+          removeFavorite: "Видалити з обраного",
+          addFavorite: "Додати в обране",
+          unknownStation: "Невідома станція",
+          onlineRadio: "Онлайн-радіо",
+          favoriteSaveError: "Не вдалося зберегти обране у цьому браузері",
+          noStream: "У цієї станції немає доступного аудіопотоку",
+          connecting: "Підключення до прямого ефіру…",
+          connectError: "Не вдалося підключитись. Спробуй іншу станцію.",
+          resumeError: "Не вдалося відновити ефір. Спробуй ще раз.",
+          buffering: "Буферизація ефіру…",
+          paused: "Пауза",
+          streamUnavailable: "Потік недоступний. Спробуй іншу станцію.",
+          liveState: "Ефір відтворюється",
+          pausedState: "Ефір на паузі",
+          retryPlayError: "Не вдалося відновити відтворення:",
+          liveStatus: (country) => `НАЖИВО${country ? ` · ${country}` : ""}`,
+        },
+        en: {
+          brandHome: "Radio Kevin — home",
+          chooseCountry: "Choose a country",
+          loadingCountries: "Loading countries…",
+          loadingStations: "Loading stations…",
+          stations: "Radio stations",
+          stationFilters: "Filter radio stations",
+          allStations: "All stations",
+          favorites: "Favorites",
+          searchStation: "Search stations…",
+          tryAgain: "Try again",
+          audioPlayer: "Audio player",
+          pickStation: "Choose a station to start listening",
+          liveEuropeAsia: "Live radio",
+          broadcastStatus: "Broadcast status",
+          volume: "Volume",
+          play: "Play",
+          pause: "Pause",
+          live: "LIVE",
+          loading: "Loading…",
+          noCountries: "No countries are available right now. Try refreshing the list.",
+          countriesError: "Could not load countries. Check your connection and try again.",
+          stationsError: "Could not load stations. Check your connection and try again.",
+          searching: (country) => `Finding radio stations in ${getCountryName(country)}…`,
+          noFavorites: "You have no saved stations in this country yet.",
+          noResults: "No stations found. Try a different search.",
+          listen: (name) => `Listen to ${name}`,
+          pauseStation: (name) => `Pause: ${name}`,
+          removeFavorite: "Remove from favorites",
+          addFavorite: "Add to favorites",
+          unknownStation: "Unknown station",
+          onlineRadio: "Online radio",
+          favoriteSaveError: "Could not save favorites in this browser",
+          noStream: "This station has no available audio stream",
+          connecting: "Connecting to the live stream…",
+          connectError: "Could not connect. Try another station.",
+          resumeError: "Could not resume the stream. Try again.",
+          buffering: "Buffering the stream…",
+          paused: "Paused",
+          streamUnavailable: "Stream unavailable. Try another station.",
+          liveState: "Broadcast is playing",
+          pausedState: "Broadcast is paused",
+          retryPlayError: "Could not resume playback:",
+          liveStatus: (country) => `LIVE${country ? ` · ${country}` : ""}`,
+        },
+      };
+      const countryLanguages = {
+        AL: "sq", AT: "de", BA: "bs", BE: "nl", BG: "bg", BY: "be", CH: "de",
+        CY: "el", CZ: "cs", DE: "de", DK: "da", EE: "et", ES: "es", FI: "fi",
+        FR: "fr", GB: "en", GR: "el", HR: "hr", HU: "hu", IE: "en", IS: "is",
+        IT: "it", LI: "de", LT: "lt", LU: "lb", LV: "lv", MD: "ro", ME: "sr",
+        MK: "mk", MT: "mt", NL: "nl", NO: "nb", PL: "pl", PT: "pt", RO: "ro",
+        RS: "sr", RU: "ru", SE: "sv", SI: "sl", SK: "sk", UA: "uk", VA: "it",
+        XK: "sq", GE: "ka", TR: "tr", AZ: "az",
+      };
+      const localizedLabels = {
+        sq: { stations: "Stacione radio", chooseCountry: "Zgjidhni një shtet", loadingCountries: "Duke ngarkuar shtetet…", loadingStations: "Duke ngarkuar stacionet…", searching: "Duke kërkuar stacione radio…", stationFilters: "Filtro stacionet", allStations: "Të gjitha", favorites: "Të preferuarat", searchStation: "Kërko stacione…", tryAgain: "Provo përsëri", audioPlayer: "Riprodhuesi audio", pickStation: "Zgjidhni një stacion për të dëgjuar", liveEuropeAsia: "Radio drejtpërdrejt", broadcastStatus: "Statusi i transmetimit", volume: "Volumi", play: "Luaj", pause: "Pauzë", live: "DREJTPËRDREJT" },
+        de: { stations: "Radiosender", chooseCountry: "Land auswählen", loadingCountries: "Länder werden geladen…", loadingStations: "Sender werden geladen…", searching: "Radiosender werden gesucht…", stationFilters: "Sender filtern", allStations: "Alle Sender", favorites: "Favoriten", searchStation: "Sender suchen…", tryAgain: "Erneut versuchen", audioPlayer: "Audioplayer", pickStation: "Sender zum Anhören auswählen", liveEuropeAsia: "Live-Radio", broadcastStatus: "Sendestatus", volume: "Lautstärke", play: "Abspielen", pause: "Pause", live: "LIVE" },
+        bs: { stations: "Radio stanice", chooseCountry: "Izaberite državu", loadingCountries: "Učitavanje država…", loadingStations: "Učitavanje stanica…", searching: "Traženje radio stanica…", stationFilters: "Filtriraj stanice", allStations: "Sve stanice", favorites: "Omiljene", searchStation: "Pretraži stanice…", tryAgain: "Pokušaj ponovo", audioPlayer: "Audio plejer", pickStation: "Izaberite stanicu za slušanje", liveEuropeAsia: "Radio uživo", broadcastStatus: "Status emitovanja", volume: "Jačina zvuka", play: "Pusti", pause: "Pauza", live: "UŽIVO" },
+        nl: { stations: "Radiostations", chooseCountry: "Kies een land", loadingCountries: "Landen laden…", loadingStations: "Stations laden…", searching: "Radiostations zoeken…", stationFilters: "Stations filteren", allStations: "Alle stations", favorites: "Favorieten", searchStation: "Stations zoeken…", tryAgain: "Opnieuw proberen", audioPlayer: "Audiospeler", pickStation: "Kies een station om te luisteren", liveEuropeAsia: "Live radio", broadcastStatus: "Uitzendstatus", volume: "Volume", play: "Afspelen", pause: "Pauze", live: "LIVE" },
+        bg: { stations: "Радиостанции", chooseCountry: "Изберете държава", loadingCountries: "Зареждане на държавите…", loadingStations: "Зареждане на станциите…", searching: "Търсене на радиостанции…", stationFilters: "Филтриране на станции", allStations: "Всички станции", favorites: "Любими", searchStation: "Търсене на станции…", tryAgain: "Опитайте отново", audioPlayer: "Аудиоплейър", pickStation: "Изберете станция за слушане", liveEuropeAsia: "Радио на живо", broadcastStatus: "Състояние на излъчването", volume: "Сила на звука", play: "Пусни", pause: "Пауза", live: "НА ЖИВО" },
+        be: { stations: "Радыёстанцыі", chooseCountry: "Абярыце краіну", loadingCountries: "Загрузка краін…", loadingStations: "Загрузка станцый…", searching: "Пошук радыёстанцый…", stationFilters: "Фільтр станцый", allStations: "Усе станцыі", favorites: "Абранае", searchStation: "Пошук станцый…", tryAgain: "Паспрабаваць зноў", audioPlayer: "Аўдыяплэер", pickStation: "Абярыце станцыю для праслухоўвання", liveEuropeAsia: "Радыё ў прамым эфіры", broadcastStatus: "Стан эфіру", volume: "Гучнасць", play: "Прайграць", pause: "Паўза", live: "НАЖЫВА" },
+        el: { stations: "Ραδιοφωνικοί σταθμοί", chooseCountry: "Επιλέξτε χώρα", loadingCountries: "Φόρτωση χωρών…", loadingStations: "Φόρτωση σταθμών…", searching: "Αναζήτηση ραδιοφωνικών σταθμών…", stationFilters: "Φιλτράρισμα σταθμών", allStations: "Όλοι οι σταθμοί", favorites: "Αγαπημένα", searchStation: "Αναζήτηση σταθμών…", tryAgain: "Δοκιμάστε ξανά", audioPlayer: "Αναπαραγωγέας ήχου", pickStation: "Επιλέξτε σταθμό για ακρόαση", liveEuropeAsia: "Ζωντανό ραδιόφωνο", broadcastStatus: "Κατάσταση μετάδοσης", volume: "Ένταση", play: "Αναπαραγωγή", pause: "Παύση", live: "ΖΩΝΤΑΝΑ" },
+        cs: { stations: "Rozhlasové stanice", chooseCountry: "Vyberte zemi", loadingCountries: "Načítání zemí…", loadingStations: "Načítání stanic…", searching: "Hledání rozhlasových stanic…", stationFilters: "Filtrovat stanice", allStations: "Všechny stanice", favorites: "Oblíbené", searchStation: "Hledat stanice…", tryAgain: "Zkusit znovu", audioPlayer: "Přehrávač zvuku", pickStation: "Vyberte stanici k poslechu", liveEuropeAsia: "Živé rádio", broadcastStatus: "Stav vysílání", volume: "Hlasitost", play: "Přehrát", pause: "Pauza", live: "ŽIVĚ" },
+        da: { stations: "Radiostationer", chooseCountry: "Vælg et land", loadingCountries: "Indlæser lande…", loadingStations: "Indlæser stationer…", searching: "Søger efter radiostationer…", stationFilters: "Filtrer stationer", allStations: "Alle stationer", favorites: "Favoritter", searchStation: "Søg efter stationer…", tryAgain: "Prøv igen", audioPlayer: "Lydafspiller", pickStation: "Vælg en station at lytte til", liveEuropeAsia: "Live radio", broadcastStatus: "Sendestatus", volume: "Lydstyrke", play: "Afspil", pause: "Pause", live: "LIVE" },
+        et: { stations: "Raadiojaamad", chooseCountry: "Vali riik", loadingCountries: "Riike laaditakse…", loadingStations: "Jaamu laaditakse…", searching: "Raadiojaamade otsimine…", stationFilters: "Filtreeri jaamu", allStations: "Kõik jaamad", favorites: "Lemmikud", searchStation: "Otsi jaamu…", tryAgain: "Proovi uuesti", audioPlayer: "Helipleier", pickStation: "Vali kuulamiseks jaam", liveEuropeAsia: "Otse raadio", broadcastStatus: "Ülekande olek", volume: "Helitugevus", play: "Esita", pause: "Paus", live: "OTSE" },
+        es: { stations: "Emisoras de radio", chooseCountry: "Elige un país", loadingCountries: "Cargando países…", loadingStations: "Cargando emisoras…", searching: "Buscando emisoras de radio…", stationFilters: "Filtrar emisoras", allStations: "Todas", favorites: "Favoritas", searchStation: "Buscar emisoras…", tryAgain: "Intentar de nuevo", audioPlayer: "Reproductor de audio", pickStation: "Elige una emisora para escuchar", liveEuropeAsia: "Radio en directo", broadcastStatus: "Estado de emisión", volume: "Volumen", play: "Reproducir", pause: "Pausa", live: "EN DIRECTO" },
+        fi: { stations: "Radioasemat", chooseCountry: "Valitse maa", loadingCountries: "Ladataan maita…", loadingStations: "Ladataan asemia…", searching: "Etsitään radioasemia…", stationFilters: "Suodata asemia", allStations: "Kaikki asemat", favorites: "Suosikit", searchStation: "Etsi asemia…", tryAgain: "Yritä uudelleen", audioPlayer: "Äänisoitin", pickStation: "Valitse kuunneltava asema", liveEuropeAsia: "Suora radiolähetys", broadcastStatus: "Lähetyksen tila", volume: "Äänenvoimakkuus", play: "Toista", pause: "Tauko", live: "LÄHETYS" },
+        fr: { stations: "Stations de radio", chooseCountry: "Choisir un pays", loadingCountries: "Chargement des pays…", loadingStations: "Chargement des stations…", searching: "Recherche de stations de radio…", stationFilters: "Filtrer les stations", allStations: "Toutes", favorites: "Favoris", searchStation: "Rechercher des stations…", tryAgain: "Réessayer", audioPlayer: "Lecteur audio", pickStation: "Choisissez une station à écouter", liveEuropeAsia: "Radio en direct", broadcastStatus: "État de la diffusion", volume: "Volume", play: "Lire", pause: "Pause", live: "EN DIRECT" },
+        hr: { stations: "Radiopostaje", chooseCountry: "Odaberite državu", loadingCountries: "Učitavanje država…", loadingStations: "Učitavanje postaja…", searching: "Traženje radiopostaja…", stationFilters: "Filtriraj postaje", allStations: "Sve postaje", favorites: "Omiljene", searchStation: "Pretraži postaje…", tryAgain: "Pokušaj ponovno", audioPlayer: "Audioplayer", pickStation: "Odaberite postaju za slušanje", liveEuropeAsia: "Radio uživo", broadcastStatus: "Status emitiranja", volume: "Glasnoća", play: "Reproduciraj", pause: "Pauza", live: "UŽIVO" },
+        hu: { stations: "Rádióállomások", chooseCountry: "Válasszon országot", loadingCountries: "Országok betöltése…", loadingStations: "Állomások betöltése…", searching: "Rádióállomások keresése…", stationFilters: "Állomások szűrése", allStations: "Összes állomás", favorites: "Kedvencek", searchStation: "Állomások keresése…", tryAgain: "Próbálja újra", audioPlayer: "Hanglejátszó", pickStation: "Válasszon egy hallgatható állomást", liveEuropeAsia: "Élő rádió", broadcastStatus: "Adás állapota", volume: "Hangerő", play: "Lejátszás", pause: "Szünet", live: "ÉLŐ" },
+        is: { stations: "Útvarpsstöðvar", chooseCountry: "Veldu land", loadingCountries: "Hleð löndum…", loadingStations: "Hleð stöðvum…", searching: "Leita að útvarpsstöðvum…", stationFilters: "Sía stöðvar", allStations: "Allar stöðvar", favorites: "Uppáhalds", searchStation: "Leita að stöðvum…", tryAgain: "Reyna aftur", audioPlayer: "Hljóðspilari", pickStation: "Veldu stöð til að hlusta", liveEuropeAsia: "Útvarp í beinni", broadcastStatus: "Staða útsendingar", volume: "Hljóðstyrkur", play: "Spila", pause: "Hlé", live: "BEINT" },
+        it: { stations: "Stazioni radio", chooseCountry: "Scegli un paese", loadingCountries: "Caricamento paesi…", loadingStations: "Caricamento stazioni…", searching: "Ricerca di stazioni radio…", stationFilters: "Filtra stazioni", allStations: "Tutte", favorites: "Preferite", searchStation: "Cerca stazioni…", tryAgain: "Riprova", audioPlayer: "Lettore audio", pickStation: "Scegli una stazione da ascoltare", liveEuropeAsia: "Radio in diretta", broadcastStatus: "Stato della trasmissione", volume: "Volume", play: "Riproduci", pause: "Pausa", live: "IN DIRETTA" },
+        lt: { stations: "Radijo stotys", chooseCountry: "Pasirinkite šalį", loadingCountries: "Įkeliamos šalys…", loadingStations: "Įkeliamos stotys…", searching: "Ieškoma radijo stočių…", stationFilters: "Filtruoti stotis", allStations: "Visos stotys", favorites: "Mėgstamos", searchStation: "Ieškoti stočių…", tryAgain: "Bandyti dar kartą", audioPlayer: "Garso grotuvas", pickStation: "Pasirinkite stotį ir klausykitės", liveEuropeAsia: "Radijas tiesiogiai", broadcastStatus: "Transliacijos būsena", volume: "Garsumas", play: "Leisti", pause: "Pauzė", live: "TIESIOGIAI" },
+        lb: { stations: "Radiostatiounen", chooseCountry: "Land auswielen", loadingCountries: "Länner ginn gelueden…", loadingStations: "Statioune ginn gelueden…", searching: "Radiostatioune ginn gesicht…", stationFilters: "Statiounen filteren", allStations: "All Statiounen", favorites: "Favoritten", searchStation: "Statiounen sichen…", tryAgain: "Nach eng Kéier probéieren", audioPlayer: "Audio-Player", pickStation: "Wielt eng Statioun fir ze lauschteren", liveEuropeAsia: "Radio live", broadcastStatus: "Sendungsstatus", volume: "Lautstäerkt", play: "Ofspillen", pause: "Paus", live: "LIVE" },
+        lv: { stations: "Radio stacijas", chooseCountry: "Izvēlieties valsti", loadingCountries: "Ielādē valstis…", loadingStations: "Ielādē stacijas…", searching: "Meklē radio stacijas…", stationFilters: "Filtrēt stacijas", allStations: "Visas stacijas", favorites: "Izlase", searchStation: "Meklēt stacijas…", tryAgain: "Mēģināt vēlreiz", audioPlayer: "Audio atskaņotājs", pickStation: "Izvēlieties staciju klausīšanai", liveEuropeAsia: "Radio tiešraidē", broadcastStatus: "Apraides statuss", volume: "Skaļums", play: "Atskaņot", pause: "Pauze", live: "TIEŠRAIDE" },
+        ro: { stations: "Posturi de radio", chooseCountry: "Alege o țară", loadingCountries: "Se încarcă țările…", loadingStations: "Se încarcă posturile…", searching: "Se caută posturi de radio…", stationFilters: "Filtrează posturile", allStations: "Toate posturile", favorites: "Favorite", searchStation: "Caută posturi…", tryAgain: "Încearcă din nou", audioPlayer: "Player audio", pickStation: "Alege un post pentru a asculta", liveEuropeAsia: "Radio în direct", broadcastStatus: "Starea transmisiei", volume: "Volum", play: "Redare", pause: "Pauză", live: "ÎN DIRECT" },
+        sr: { stations: "Radio stanice", chooseCountry: "Izaberite zemlju", loadingCountries: "Učitavanje zemalja…", loadingStations: "Učitavanje stanica…", searching: "Pretraga radio stanica…", stationFilters: "Filtriraj stanice", allStations: "Sve stanice", favorites: "Omiljene", searchStation: "Pretraži stanice…", tryAgain: "Pokušaj ponovo", audioPlayer: "Audio plejer", pickStation: "Izaberite stanicu za slušanje", liveEuropeAsia: "Radio uživo", broadcastStatus: "Status emitovanja", volume: "Jačina zvuka", play: "Pusti", pause: "Pauza", live: "UŽIVO" },
+        mk: { stations: "Радио станици", chooseCountry: "Изберете држава", loadingCountries: "Се вчитуваат државите…", loadingStations: "Се вчитуваат станиците…", searching: "Се бараат радио станици…", stationFilters: "Филтрирај станици", allStations: "Сите станици", favorites: "Омилени", searchStation: "Пребарај станици…", tryAgain: "Обиди се повторно", audioPlayer: "Аудио плеер", pickStation: "Изберете станица за слушање", liveEuropeAsia: "Радио во живо", broadcastStatus: "Статус на емитување", volume: "Јачина на звук", play: "Пушти", pause: "Пауза", live: "ВО ЖИВО" },
+        mt: { stations: "Stazzjonijiet tar-radju", chooseCountry: "Agħżel pajjiż", loadingCountries: "Qed jitgħabbew il-pajjiżi…", loadingStations: "Qed jitgħabbew l-istazzjonijiet…", searching: "Qed infittex stazzjonijiet tar-radju…", stationFilters: "Iffiltra l-istazzjonijiet", allStations: "L-istazzjonijiet kollha", favorites: "Favoriti", searchStation: "Fittex stazzjonijiet…", tryAgain: "Erġa’ pprova", audioPlayer: "Plejer tal-awdjo", pickStation: "Agħżel stazzjon biex tisma’", liveEuropeAsia: "Radju dirett", broadcastStatus: "Stat tax-xandir", volume: "Volum", play: "Iddoqq", pause: "Pawża", live: "DIRETT" },
+        nb: { stations: "Radiostasjoner", chooseCountry: "Velg et land", loadingCountries: "Laster inn land…", loadingStations: "Laster inn stasjoner…", searching: "Søker etter radiostasjoner…", stationFilters: "Filtrer stasjoner", allStations: "Alle stasjoner", favorites: "Favoritter", searchStation: "Søk etter stasjoner…", tryAgain: "Prøv igjen", audioPlayer: "Lydspiller", pickStation: "Velg en stasjon å lytte til", liveEuropeAsia: "Direkteradio", broadcastStatus: "Sendestatus", volume: "Lydstyrke", play: "Spill av", pause: "Pause", live: "DIREKTE" },
+        pl: { stations: "Stacje radiowe", chooseCountry: "Wybierz kraj", loadingCountries: "Ładowanie krajów…", loadingStations: "Ładowanie stacji…", searching: "Wyszukiwanie stacji radiowych…", stationFilters: "Filtruj stacje", allStations: "Wszystkie", favorites: "Ulubione", searchStation: "Szukaj stacji…", tryAgain: "Spróbuj ponownie", audioPlayer: "Odtwarzacz audio", pickStation: "Wybierz stację do słuchania", liveEuropeAsia: "Radio na żywo", broadcastStatus: "Stan transmisji", volume: "Głośność", play: "Odtwórz", pause: "Pauza", live: "NA ŻYWO" },
+        pt: { stations: "Estações de rádio", chooseCountry: "Escolha um país", loadingCountries: "A carregar países…", loadingStations: "A carregar estações…", searching: "A procurar estações de rádio…", stationFilters: "Filtrar estações", allStations: "Todas", favorites: "Favoritas", searchStation: "Pesquisar estações…", tryAgain: "Tentar novamente", audioPlayer: "Leitor de áudio", pickStation: "Escolha uma estação para ouvir", liveEuropeAsia: "Rádio em direto", broadcastStatus: "Estado da transmissão", volume: "Volume", play: "Reproduzir", pause: "Pausa", live: "EM DIRETO" },
+        ru: { stations: "Радиостанции", chooseCountry: "Выберите страну", loadingCountries: "Загрузка стран…", loadingStations: "Загрузка станций…", searching: "Поиск радиостанций…", stationFilters: "Фильтр станций", allStations: "Все станции", favorites: "Избранное", searchStation: "Поиск станций…", tryAgain: "Попробовать снова", audioPlayer: "Аудиоплеер", pickStation: "Выберите станцию для прослушивания", liveEuropeAsia: "Радио в прямом эфире", broadcastStatus: "Состояние эфира", volume: "Громкость", play: "Воспроизвести", pause: "Пауза", live: "В ЭФИРЕ" },
+        sv: { stations: "Radiostationer", chooseCountry: "Välj ett land", loadingCountries: "Laddar länder…", loadingStations: "Laddar stationer…", searching: "Söker efter radiostationer…", stationFilters: "Filtrera stationer", allStations: "Alla stationer", favorites: "Favoriter", searchStation: "Sök stationer…", tryAgain: "Försök igen", audioPlayer: "Ljudspelare", pickStation: "Välj en station att lyssna på", liveEuropeAsia: "Direktsänd radio", broadcastStatus: "Sändningsstatus", volume: "Volym", play: "Spela", pause: "Paus", live: "DIREKT" },
+        sl: { stations: "Radijske postaje", chooseCountry: "Izberite državo", loadingCountries: "Nalaganje držav…", loadingStations: "Nalaganje postaj…", searching: "Iskanje radijskih postaj…", stationFilters: "Filtriraj postaje", allStations: "Vse postaje", favorites: "Priljubljene", searchStation: "Poišči postaje…", tryAgain: "Poskusi znova", audioPlayer: "Predvajalnik zvoka", pickStation: "Izberite postajo za poslušanje", liveEuropeAsia: "Radio v živo", broadcastStatus: "Stanje oddajanja", volume: "Glasnost", play: "Predvajaj", pause: "Premor", live: "V ŽIVO" },
+        sk: { stations: "Rozhlasové stanice", chooseCountry: "Vyberte krajinu", loadingCountries: "Načítavanie krajín…", loadingStations: "Načítavanie staníc…", searching: "Vyhľadávanie rozhlasových staníc…", stationFilters: "Filtrovať stanice", allStations: "Všetky stanice", favorites: "Obľúbené", searchStation: "Hľadať stanice…", tryAgain: "Skúsiť znova", audioPlayer: "Prehrávač zvuku", pickStation: "Vyberte stanicu na počúvanie", liveEuropeAsia: "Rádio naživo", broadcastStatus: "Stav vysielania", volume: "Hlasitosť", play: "Prehrať", pause: "Pauza", live: "NAŽIVO" },
+        ka: { stations: "რადიოსადგურები", chooseCountry: "აირჩიეთ ქვეყანა", loadingCountries: "ქვეყნების ჩატვირთვა…", loadingStations: "სადგურების ჩატვირთვა…", searching: "რადიოსადგურების ძიება…", stationFilters: "სადგურების გაფილტვრა", allStations: "ყველა სადგური", favorites: "რჩეულები", searchStation: "სადგურების ძიება…", tryAgain: "ხელახლა სცადეთ", audioPlayer: "აუდიოპლეერი", pickStation: "მოსასმენად აირჩიეთ სადგური", liveEuropeAsia: "პირდაპირი რადიო", broadcastStatus: "ტრანსლაციის სტატუსი", volume: "ხმის დონე", play: "დაკვრა", pause: "პაუზა", live: "პირდაპირ ეთერში" },
+        tr: { stations: "Radyo istasyonları", chooseCountry: "Bir ülke seçin", loadingCountries: "Ülkeler yükleniyor…", loadingStations: "İstasyonlar yükleniyor…", searching: "Radyo istasyonları aranıyor…", stationFilters: "İstasyonları filtrele", allStations: "Tüm istasyonlar", favorites: "Favoriler", searchStation: "İstasyon ara…", tryAgain: "Tekrar dene", audioPlayer: "Ses oynatıcı", pickStation: "Dinlemek için bir istasyon seçin", liveEuropeAsia: "Canlı radyo", broadcastStatus: "Yayın durumu", volume: "Ses düzeyi", play: "Oynat", pause: "Duraklat", live: "CANLI" },
+        az: { stations: "Radio stansiyaları", chooseCountry: "Ölkə seçin", loadingCountries: "Ölkələr yüklənir…", loadingStations: "Stansiyalar yüklənir…", searching: "Radio stansiyaları axtarılır…", stationFilters: "Stansiyaları filtrlə", allStations: "Bütün stansiyalar", favorites: "Sevimlilər", searchStation: "Stansiyalarda axtar…", tryAgain: "Yenidən cəhd et", audioPlayer: "Audio pleyer", pickStation: "Dinləmək üçün stansiya seçin", liveEuropeAsia: "Canlı radio", broadcastStatus: "Yayımın vəziyyəti", volume: "Səs səviyyəsi", play: "Oynat", pause: "Fasilə", live: "CANLI" },
+      };
+      let currentLanguage = "uk";
+      let pendingMessage = null;
+      let playerStatusKey = "liveEuropeAsia";
+      let playerStatusArgs = [];
+      try {
+        const previousFavorites = localStorage.getItem("radio-atlas-favorites-europe-asia");
+        if (!localStorage.getItem(favoriteKey) && previousFavorites) {
+          localStorage.setItem(favoriteKey, previousFavorites);
+        }
+        localStorage.removeItem("radio-atlas-favorites-europe-asia");
+        localStorage.removeItem("radio-atlas-favorites");
+      } catch (error) {
+        console.error("Could not migrate the saved favorites:", error);
+      }
+      let countries = [];
+      let stations = [];
+      let activeFilter = "all";
+      let activeStation = null;
+      let isPlaying = false;
+      let loadingStations = false;
+
+      function getFavorites() {
+        try {
+          const value = JSON.parse(localStorage.getItem(favoriteKey) || "[]");
+          return new Set(Array.isArray(value) ? value : []);
+        } catch (error) {
+          console.error("Не вдалося прочитати обрані станції:", error);
+          return new Set();
+        }
+      }
+
+      let favorites = getFavorites();
+
+      function t(key, ...args) {
+        if (key === "liveStatus") {
+          return `${t("live")}${args[0] ? ` · ${args[0]}` : ""}`;
+        }
+        const value =
+          localizedLabels[currentLanguage]?.[key] ??
+          translations[currentLanguage]?.[key] ??
+          translations.en[key];
+        return typeof value === "function" ? value(...args) : value;
+      }
+
+      function getCountryLanguage(countryCode) {
+        return countryLanguages[countryCode] || "en";
+      }
+
+      function getCountryOptionName(country) {
+        const countryCode = country.iso_3166_1;
+        try {
+          const englishName = new Intl.DisplayNames(["en"], { type: "region" }).of(countryCode);
+          const nativeName = new Intl.DisplayNames(
+            [getCountryLanguage(countryCode)],
+            { type: "region" },
+          ).of(countryCode);
+          if (englishName && nativeName) {
+            return `${englishName} (${nativeName})`;
+          }
+          return englishName || country.name;
+        } catch {
+          return country.name;
+        }
+      }
+
+      function setPlayerStatus(key, ...args) {
+        playerStatusKey = key;
+        playerStatusArgs = args;
+        playerStatus.textContent = t(key, ...args);
+      }
+
+      function applyLanguage() {
+        const language = currentLanguage;
+        document.documentElement.lang = language;
+        document.title = `Radio Kevin — ${t("stations")}`;
+        document
+          .querySelectorAll("[data-i18n]")
+          .forEach((element) => (element.textContent = t(element.dataset.i18n)));
+        document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
+          element.setAttribute("aria-label", t(element.dataset.i18nAria));
+        });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+          element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
+        });
+        if (pendingMessage) {
+          messageText.textContent = t(pendingMessage.key, ...pendingMessage.args);
+        }
+        if (!activeStation && !pendingMessage) {
+          playerName.textContent = t("pickStation");
+        }
+        setPlayerStatus(playerStatusKey, ...playerStatusArgs);
+        renderCountryOptions();
+        if (stations.length > 0) {
+          renderStations();
+          const country = countries.find((item) => item.iso_3166_1 === countrySelect.value);
+          if (country) selectedCountry.textContent = getCountryName(country);
+        }
+        updatePlayerButton(isPlaying);
+      }
+
+      function renderCountryOptions() {
+        const selectedCode = countrySelect.value;
+        countrySelect.replaceChildren();
+        if (countries.length === 0) {
+          const option = new Option(t("loadingCountries"), "");
+          countrySelect.append(option);
+          return;
+        }
+        const sortedCountries = [...countries].sort((first, second) => {
+          if (first.iso_3166_1 === "UA") return -1;
+          if (second.iso_3166_1 === "UA") return 1;
+          return getCountryOptionName(first).localeCompare(getCountryOptionName(second), "en");
+        });
+        for (const country of sortedCountries) {
+          const option = new Option(
+            getCountryOptionName(country),
+            country.iso_3166_1,
+          );
+          countrySelect.append(option);
+        }
+        countrySelect.value = selectedCode || countries[0].iso_3166_1;
+      }
+
+      function setLanguage(language) {
+        currentLanguage = language;
+        applyLanguage();
+      }
+
+      function showTranslatedMessage(key, retry = false, ...args) {
+        pendingMessage = { key, args };
+        messageText.textContent = t(key, ...args);
+        retryButton.hidden = !retry;
+        message.hidden = false;
+        stationList.hidden = true;
+      }
+
+      function hideMessage() {
+        pendingMessage = null;
+        message.hidden = true;
+        stationList.hidden = false;
+      }
+
+      function getCountryName(country) {
+        try {
+          return new Intl.DisplayNames([currentLanguage], { type: "region" }).of(country.iso_3166_1) || country.name;
+        } catch {
+          return country.name;
+        }
+      }
+
+      function createStationArtwork(station) {
+        const name = station.name || "FM";
+        const seed = `${station.stationuuid || ""}${name}`.split("").reduce(
+          (value, character) => (value * 31 + character.charCodeAt(0)) >>> 0,
+          7,
+        );
+        const hue = seed % 360;
+        const fallback = `data:image/svg+xml,${encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="hsl(${hue} 48% 27%)"/><stop offset="1" stop-color="hsl(${(hue + 62) % 360} 58% 13%)"/></linearGradient></defs><rect width="96" height="96" rx="14" fill="url(#g)"/><circle cx="48" cy="48" r="31" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="2"/><circle cx="48" cy="48" r="21" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="2"/><path d="M17 51h12l7-15 12 29 10-22 8 8h13" fill="none" stroke="hsl(${(hue + 90) % 360} 90% 78%)" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/></svg>`,
+        )}`;
+        const image = document.createElement("img");
+        image.alt = "";
+        image.referrerPolicy = "no-referrer";
+        image.loading = "lazy";
+        image.src = fallback;
+        if (station.favicon && /^https?:\/\//i.test(station.favicon)) {
+          image.addEventListener(
+            "error",
+            () => {
+              image.src = fallback;
+            },
+            { once: true },
+          );
+          image.src = station.favicon;
+        }
+        return image;
+      }
+
+      async function fetchJson(url) {
+        const response = await fetch(url);
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || `Помилка запиту: ${response.status}`);
+        }
+        return result;
+      }
+
+      async function loadCountries() {
+        countrySelect.disabled = true;
+        try {
+          countries = await fetchJson("/api/countries");
+          countries = countries
+            .filter((country) => country.stationcount > 0);
+          countrySelect.replaceChildren();
+
+          for (const country of countries) {
+            const option = document.createElement("option");
+            option.value = country.iso_3166_1;
+            option.textContent = getCountryName(country);
+            countrySelect.append(option);
+          }
+
+          const preferredCountry = countries.find((country) => country.iso_3166_1 === "UA");
+          if (preferredCountry) {
+            countrySelect.value = preferredCountry.iso_3166_1;
+          }
+          setLanguage(getCountryLanguage(countrySelect.value));
+          countrySelect.disabled = countries.length === 0;
+          if (countries.length === 0) {
+            showTranslatedMessage("noCountries", true);
+            return;
+          }
+          await loadStations();
+        } catch (error) {
+          console.error("Помилка завантаження країн:", error);
+          countrySelect.replaceChildren(new Option(t("countriesError"), ""));
+          showTranslatedMessage("countriesError", true);
+        }
+      }
+
+      async function loadStations() {
+        const country = countries.find((item) => item.iso_3166_1 === countrySelect.value);
+        if (!country) return;
+
+        loadingStations = true;
+        stations = [];
+        selectedCountry.textContent = getCountryName(country);
+        showTranslatedMessage("searching", false, country);
+        try {
+          stations = await fetchJson(`/api/stations?countrycode=${encodeURIComponent(country.iso_3166_1)}`);
+          renderStations();
+        } catch (error) {
+          console.error(`Помилка завантаження станцій ${country.iso_3166_1}:`, error);
+          showTranslatedMessage("stationsError", true);
+        } finally {
+          loadingStations = false;
+        }
+      }
+
+      function renderStations() {
+        const query = searchInput.value.trim().toLocaleLowerCase("uk");
+        const visibleStations = stations.filter((station) => {
+          const matchesQuery =
+            !query ||
+            `${station.name} ${station.tags || ""} ${station.language || ""}`
+              .toLocaleLowerCase("uk")
+              .includes(query);
+          return matchesQuery && (activeFilter !== "favorites" || favorites.has(station.stationuuid));
+        });
+
+        stationList.replaceChildren();
+        for (const station of visibleStations) {
+          stationList.append(createStationCard(station));
+        }
+
+        if (visibleStations.length === 0) {
+          const messageKey = activeFilter === "favorites" && !query ? "noFavorites" : "noResults";
+          showTranslatedMessage(messageKey);
+          return;
+        }
+        hideMessage();
+      }
+
+      function createStationCard(station) {
+        const card = document.createElement("article");
+        card.className = "station-card";
+        const isCurrentStation = activeStation?.stationuuid === station.stationuuid;
+        if (isCurrentStation && isPlaying) {
+          card.classList.add("is-playing");
+        }
+
+        const logo = document.createElement("div");
+        logo.className = "station-logo";
+        logo.replaceChildren(createStationArtwork(station));
+
+        const details = document.createElement("div");
+        details.className = "station-details";
+        const name = document.createElement("p");
+        name.className = "station-name";
+        name.textContent = station.name || t("unknownStation");
+        const meta = document.createElement("p");
+        meta.className = "station-meta";
+        const tags = (station.tags || "").split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 2);
+        meta.textContent = tags.join(" · ") || station.language || t("onlineRadio");
+        details.append(name, meta);
+
+        const actions = document.createElement("div");
+        actions.className = "station-actions";
+        const favorite = document.createElement("button");
+        favorite.type = "button";
+        favorite.className = `icon-button${favorites.has(station.stationuuid) ? " is-favorite" : ""}`;
+        favorite.setAttribute("aria-label", favorites.has(station.stationuuid) ? t("removeFavorite") : t("addFavorite"));
+        favorite.setAttribute("aria-pressed", String(favorites.has(station.stationuuid)));
+        favorite.innerHTML =
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m12 20-1.4-1.3C5.5 14.1 2 10.9 2 7a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 3.9-3.5 7.1-8.6 11.7L12 20Z"/></svg>';
+        favorite.addEventListener("click", () => toggleFavorite(station));
+
+        const play = document.createElement("button");
+        play.type = "button";
+        const stationIsActive = isCurrentStation && !audio.paused;
+        play.className = `play-button${isCurrentStation && isPlaying ? " is-playing" : ""}`;
+        play.setAttribute("aria-label", stationIsActive ? t("pauseStation", station.name) : t("listen", station.name));
+        play.innerHTML = stationIsActive
+          ? '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+        play.addEventListener("click", () => toggleStation(station));
+        actions.append(favorite, play);
+        card.append(logo, details, actions);
+        return card;
+      }
+
+      function toggleFavorite(station) {
+        if (favorites.has(station.stationuuid)) {
+          favorites.delete(station.stationuuid);
+        } else {
+          favorites.add(station.stationuuid);
+        }
+        try {
+          localStorage.setItem(favoriteKey, JSON.stringify([...favorites]));
+        } catch (error) {
+          console.error("Не вдалося зберегти обрані станції:", error);
+          setPlayerStatus("favoriteSaveError");
+        }
+        renderStations();
+      }
+
+      async function playStation(station) {
+        const streamUrl = station.url_resolved || station.url;
+        if (!streamUrl || !/^https?:\/\//i.test(streamUrl)) {
+          setPlayerStatus("noStream");
+          return;
+        }
+        activeStation = station;
+        isPlaying = false;
+        updatePlayerButton(false);
+        audio.src = streamUrl;
+        audio.volume = Number(volume.value);
+        playerName.textContent = station.name || t("unknownStation");
+        setPlayerStatus("connecting");
+        playerStatus.classList.remove("is-live");
+        playerToggle.disabled = false;
+        playerArt.replaceChildren(createStationArtwork(station));
+        renderStations();
+        try {
+          await audio.play();
+        } catch (error) {
+          isPlaying = false;
+          console.error(`Не вдалося відтворити "${station.name}":`, error);
+          setPlayerStatus("connectError");
+          playerStatus.classList.remove("is-live");
+          updatePlayerButton(false);
+          renderStations();
+        }
+      }
+
+      async function toggleStation(station) {
+        if (activeStation?.stationuuid === station.stationuuid) {
+          if (!audio.paused) {
+            audio.pause();
+            return;
+          }
+          try {
+            await audio.play();
+          } catch (error) {
+            console.error(`Не вдалося відновити "${station.name}":`, error);
+            setPlayerStatus("resumeError");
+          }
+          return;
+        }
+        await playStation(station);
+      }
+
+      function updatePlayerButton(isPlaying) {
+        playerToggle.classList.toggle("is-playing", isPlaying);
+        signalMeter.classList.toggle("is-playing", isPlaying);
+        signalMeter.setAttribute("aria-label", isPlaying ? t("liveState") : t("pausedState"));
+        playerToggle.setAttribute("aria-label", isPlaying ? t("pause") : t("play"));
+        playerToggle.innerHTML = isPlaying
+          ? '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+      }
+
+      countrySelect.addEventListener("change", () => {
+        setLanguage(getCountryLanguage(countrySelect.value));
+        loadStations();
+      });
+      searchInput.addEventListener("input", renderStations);
+      retryButton.addEventListener("click", () => {
+        if (countries.length === 0) {
+          loadCountries();
+        } else {
+          loadStations();
+        }
+      });
+      document.querySelectorAll(".filter-button").forEach((button) => {
+        button.addEventListener("click", () => {
+          activeFilter = button.dataset.filter;
+          document.querySelectorAll(".filter-button").forEach((item) => {
+            item.setAttribute("aria-pressed", String(item === button));
+          });
+          renderStations();
+        });
+      });
+      playerToggle.addEventListener("click", async () => {
+        if (audio.paused && activeStation) {
+          try {
+            await audio.play();
+          } catch (error) {
+            console.error("Не вдалося відновити відтворення:", error);
+            setPlayerStatus("resumeError");
+          }
+        } else {
+          audio.pause();
+        }
+      });
+      volume.addEventListener("input", () => {
+        audio.volume = Number(volume.value);
+      });
+      audio.addEventListener("playing", () => {
+        isPlaying = true;
+        setPlayerStatus("liveStatus", activeStation?.country || "");
+        playerStatus.classList.add("is-live");
+        updatePlayerButton(true);
+        renderStations();
+      });
+      audio.addEventListener("waiting", () => {
+        isPlaying = false;
+        setPlayerStatus("buffering");
+        playerStatus.classList.remove("is-live");
+        updatePlayerButton(false);
+      });
+      audio.addEventListener("pause", () => {
+        isPlaying = false;
+        if (activeStation) {
+          setPlayerStatus("paused");
+          playerStatus.classList.remove("is-live");
+        }
+        updatePlayerButton(false);
+        renderStations();
+      });
+      audio.addEventListener("error", () => {
+        isPlaying = false;
+        if (activeStation) {
+          setPlayerStatus("streamUnavailable");
+          playerStatus.classList.remove("is-live");
+          updatePlayerButton(false);
+          renderStations();
+        }
+      });
+
+      applyLanguage();
+      loadCountries();
+    </script>
+  </body>
+</html>
