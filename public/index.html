@@ -60,6 +60,13 @@
         color: inherit;
       }
 
+      button:focus-visible,
+      select:focus-visible,
+      input:focus-visible {
+        outline: 2px solid var(--lime);
+        outline-offset: 3px;
+      }
+
       .shell {
         width: min(1120px, calc(100% - 48px));
         margin: 0 auto;
@@ -173,7 +180,7 @@
       }
 
       .filter-button {
-        min-height: 32px;
+        min-height: 40px;
         padding: 0 12px;
         border: 0;
         border-radius: 6px;
@@ -314,7 +321,7 @@
       .station-actions {
         display: flex;
         align-items: center;
-        gap: 2px;
+        gap: 6px;
       }
 
       .icon-button,
@@ -332,9 +339,9 @@
       }
 
       .icon-button {
-        width: 32px;
-        height: 32px;
-        border-color: transparent;
+        width: 40px;
+        height: 40px;
+        border-color: #383a32;
         color: #898b82;
       }
 
@@ -349,7 +356,18 @@
       }
 
       .play-button {
+        width: auto;
+        min-width: 82px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 0 12px;
+        border-radius: 20px;
         color: var(--lime);
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
       }
 
       .play-button:hover {
@@ -413,6 +431,7 @@
       }
 
       .retry-button {
+        min-height: 44px;
         padding: 8px 13px;
         border: 1px solid #525643;
         border-radius: 7px;
@@ -528,8 +547,8 @@
       }
 
       .player-main-button {
-        width: 42px;
-        height: 42px;
+        width: 46px;
+        height: 46px;
         flex: 0 0 auto;
         display: grid;
         place-items: center;
@@ -683,17 +702,38 @@
         }
 
         .station-list {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-columns: 1fr;
         }
 
         .station-card {
-          flex-wrap: wrap;
-          gap: 7px;
-          padding: 8px;
+          display: grid;
+          grid-template-columns: 42px minmax(0, 1fr);
+          gap: 10px;
+          padding: 10px;
         }
 
         .station-actions {
-          margin-left: auto;
+          grid-column: 1 / -1;
+          display: grid;
+          grid-template-columns: 44px minmax(0, 1fr);
+          gap: 8px;
+          margin: 0;
+        }
+
+        .icon-button,
+        .play-button {
+          width: 100%;
+          min-height: 44px;
+          height: 44px;
+        }
+
+        .icon-button {
+          border-radius: 12px;
+        }
+
+        .play-button {
+          justify-content: center;
+          border-radius: 12px;
         }
 
         .player-inner {
@@ -716,8 +756,8 @@
       }
 
       @media (max-width: 380px) {
-        .station-list {
-          grid-template-columns: 1fr;
+        .filter-button {
+          padding: 0 10px;
         }
       }
 
@@ -979,6 +1019,10 @@
       let activeStation = null;
       let isPlaying = false;
       let loadingStations = false;
+      let activeStreamUrls = [];
+      let activeStreamIndex = -1;
+      let playbackRequestId = 0;
+      const failedStreamIndexes = new Set();
 
       function getFavorites() {
         try {
@@ -1264,6 +1308,9 @@
         play.innerHTML = stationIsActive
           ? '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>'
           : '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+        const playLabel = document.createElement("span");
+        playLabel.textContent = t(stationIsActive ? "pause" : "play");
+        play.append(playLabel);
         play.addEventListener("click", () => toggleStation(station));
         actions.append(favorite, play);
         card.append(logo, details, actions);
@@ -1286,32 +1333,59 @@
       }
 
       async function playStation(station) {
-        const streamUrl = station.url_resolved || station.url;
-        if (!streamUrl || !/^https?:\/\//i.test(streamUrl)) {
+        activeStreamUrls = [...new Set([station.url_resolved, station.url].filter(
+          (url) => typeof url === "string" && /^https?:\/\//i.test(url),
+        ))];
+        if (activeStreamUrls.length === 0) {
           setPlayerStatus("noStream");
           return;
         }
+        const requestId = ++playbackRequestId;
+        activeStreamIndex = -1;
+        failedStreamIndexes.clear();
         activeStation = station;
         isPlaying = false;
         updatePlayerButton(false);
-        audio.src = streamUrl;
-        audio.volume = Number(volume.value);
         playerName.textContent = station.name || t("unknownStation");
         setPlayerStatus("connecting");
         playerStatus.classList.remove("is-live");
         playerToggle.disabled = false;
         playerArt.replaceChildren(createStationArtwork(station));
         renderStations();
+        await tryStream(0, requestId);
+      }
+
+      async function tryStream(index, requestId) {
+        if (requestId !== playbackRequestId || index >= activeStreamUrls.length) return;
+        activeStreamIndex = index;
+        audio.src = activeStreamUrls[index];
+        audio.volume = Number(volume.value);
         try {
           await audio.play();
         } catch (error) {
-          isPlaying = false;
-          console.error(`Не вдалося відтворити "${station.name}":`, error);
-          setPlayerStatus("connectError");
-          playerStatus.classList.remove("is-live");
-          updatePlayerButton(false);
-          renderStations();
+          if (requestId !== playbackRequestId) return;
+          console.error(`Не вдалося відтворити "${activeStation?.name}":`, error);
+          await advanceStream(requestId, index);
         }
+      }
+
+      async function advanceStream(requestId, failedIndex = activeStreamIndex) {
+        if (
+          requestId !== playbackRequestId ||
+          failedIndex !== activeStreamIndex ||
+          failedStreamIndexes.has(failedIndex)
+        ) return;
+        failedStreamIndexes.add(failedIndex);
+        const nextIndex = activeStreamUrls.findIndex((_, index) => !failedStreamIndexes.has(index));
+        if (nextIndex !== -1) {
+          await tryStream(nextIndex, requestId);
+          return;
+        }
+        isPlaying = false;
+        setPlayerStatus("streamUnavailable");
+        playerStatus.classList.remove("is-live");
+        updatePlayerButton(false);
+        renderStations();
       }
 
       async function toggleStation(station) {
@@ -1320,11 +1394,15 @@
             audio.pause();
             return;
           }
+          if (failedStreamIndexes.has(activeStreamIndex)) {
+            await playStation(station);
+            return;
+          }
           try {
             await audio.play();
           } catch (error) {
             console.error(`Не вдалося відновити "${station.name}":`, error);
-            setPlayerStatus("resumeError");
+            await advanceStream(playbackRequestId, activeStreamIndex);
           }
           return;
         }
@@ -1364,11 +1442,15 @@
       });
       playerToggle.addEventListener("click", async () => {
         if (audio.paused && activeStation) {
+          if (failedStreamIndexes.has(activeStreamIndex)) {
+            await playStation(activeStation);
+            return;
+          }
           try {
             await audio.play();
           } catch (error) {
             console.error("Не вдалося відновити відтворення:", error);
-            setPlayerStatus("resumeError");
+            await advanceStream(playbackRequestId, activeStreamIndex);
           }
         } else {
           audio.pause();
@@ -1400,12 +1482,8 @@
         renderStations();
       });
       audio.addEventListener("error", () => {
-        isPlaying = false;
-        if (activeStation) {
-          setPlayerStatus("streamUnavailable");
-          playerStatus.classList.remove("is-live");
-          updatePlayerButton(false);
-          renderStations();
+        if (activeStation && activeStreamIndex >= 0) {
+          void advanceStream(playbackRequestId);
         }
       });
 

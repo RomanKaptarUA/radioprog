@@ -37,6 +37,19 @@ async function getRadioData(pathname) {
   return data;
 }
 
+function normalizeStreamUrl(value) {
+  try {
+    const streamUrl = new URL(value);
+    if (streamUrl.protocol !== "http:" && streamUrl.protocol !== "https:") {
+      return null;
+    }
+    streamUrl.hash = "";
+    return streamUrl.href;
+  } catch {
+    return null;
+  }
+}
+
 const server = http.createServer(async (request, response) => {
   if (request.method !== "GET") {
     response.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
@@ -97,10 +110,30 @@ const server = http.createServer(async (request, response) => {
     try {
       const pathname =
         `/json/stations/bycountrycodeexact/${countryCode}` +
-        "?limit=24&order=clickcount&reverse=true&hidebroken=true";
+        "?limit=100&order=clickcount&reverse=true&hidebroken=true";
       const allStations = await getRadioData(pathname);
-      const stations = allStations.map(
-        ({ stationuuid, name, url, url_resolved, favicon, tags, language, country, countrycode }) => ({
+      const stations = [];
+      const seenNames = new Set();
+      const seenStreams = new Set();
+      for (const station of allStations) {
+        const { stationuuid, name, url, url_resolved, favicon, tags, language, country, countrycode } = station;
+        const streamUrls = [url_resolved, url].map(normalizeStreamUrl).filter(Boolean);
+        if (streamUrls.length === 0) continue;
+
+        const normalizedName = (name || "")
+          .normalize("NFKC")
+          .toLocaleLowerCase()
+          .replace(/[\p{P}\p{S}\s]+/gu, "");
+        if (
+          (normalizedName && seenNames.has(normalizedName)) ||
+          streamUrls.some((streamUrl) => seenStreams.has(streamUrl))
+        ) continue;
+
+        if (normalizedName) seenNames.add(normalizedName);
+        for (const streamUrl of streamUrls) {
+          seenStreams.add(streamUrl);
+        }
+        stations.push({
           stationuuid,
           name,
           url,
@@ -110,8 +143,9 @@ const server = http.createServer(async (request, response) => {
           language,
           country,
           countrycode,
-        }),
-      );
+        });
+        if (stations.length === 24) break;
+      }
       response.writeHead(200, {
         "Content-Type": "application/json; charset=utf-8",
         "Cache-Control": "public, max-age=300",
