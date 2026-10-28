@@ -2,7 +2,7 @@ const http = require("node:http");
 const { readFile } = require("node:fs/promises");
 const path = require("node:path");
 
-const host = "127.0.0.1";
+const host = "0.0.0.0";
 const port = Number(process.env.PORT) || 3001;
 const publicDirectory = path.join(__dirname, "..", "public");
 const pagePath = path.join(publicDirectory, "index.html");
